@@ -17,7 +17,7 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: echo "TODO: make tests"
+        run: echo "TODO"
   gds:
     needs: test
     runs-on: ubuntu-24.04
