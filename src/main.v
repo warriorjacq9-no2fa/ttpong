@@ -48,11 +48,17 @@ module tt_um_pong (
         end
     end
 
-    always @(posedge vsync or negedge rst_n) begin
-            if(~rst_n) begin
-                counter <= 0;
-            end
-            counter <= counter + 1;
+    reg vsync_d;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            vsync_d <= 0;
+            counter <= 0;
+        end else begin
+            vsync_d <= vsync; // delay version
+            if (vsync && !vsync_d)
+                counter <= counter + 1; // rising edge detect
+        end
     end
 
     wire _unused = &{ui_in, uio_in, ena, tr[11:4], tg[11:4], 1'b0};
