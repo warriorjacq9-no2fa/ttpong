@@ -54,7 +54,7 @@ jobs:
     steps:
       - name: Zip
         run: |
-          zip -r release.zip \
+          zip -r release.zip . -i \
           src/* \
           docs/* \
           tt_submission/* \
