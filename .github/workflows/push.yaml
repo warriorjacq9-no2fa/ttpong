@@ -47,3 +47,23 @@ jobs:
       id-token: write   # to verify the deployment originates from an appropriate source
     steps:
       - uses: TinyTapeout/tt-gds-action/viewer@ttsky25b
+  
+  release:
+    needs: gds
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Zip
+        run: |
+          zip -r release.zip \
+          src/* \
+          docs/* \
+          tt_submission/* \
+          info.yaml \
+          LICENSE
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: release.zip
