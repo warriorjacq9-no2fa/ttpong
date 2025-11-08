@@ -38,10 +38,14 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Zip
+      - name: Get artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tt_submission
+      
+      - name: Zip artifact
         run: |
-          ls
-          zip -r release.zip . -i src/* docs/* tt_submission/* info.yaml LICENSE
+          zip -r release.zip tt_submission
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
