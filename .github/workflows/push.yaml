@@ -40,12 +40,8 @@ jobs:
     steps:
       - name: Zip
         run: |
-          zip -r release.zip . -i \
-          src/* \
-          docs/* \
-          tt_submission/* \
-          info.yaml \
-          LICENSE
+          ls
+          zip -r release.zip . -i src/* docs/* tt_submission/* info.yaml LICENSE
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
