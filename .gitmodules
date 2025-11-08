@@ -1,0 +1,3 @@
+[submodule "test/vga-test"]
+	path = test/vga-test
+	url = https://github.com/warriorjacq9-no2fa/vga-test.git
