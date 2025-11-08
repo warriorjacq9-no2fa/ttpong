@@ -1,4 +1,4 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/test/badge.svg)
+[![Main build](https://github.com/warriorjacq9-no2fa/ttpong/actions/workflows/push.yaml/badge.svg)](https://github.com/warriorjacq9-no2fa/ttpong/actions/workflows/push.yaml)
 
 # TinyTapeout Pong game
 This is a Pong game written entirely in Verilog-HDL for the TinyTapeout project. It supports 2 players and outputs in VGA format

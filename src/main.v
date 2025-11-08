@@ -37,13 +37,13 @@ module tt_um_pong (
 
 
     /* verilator lint_off LATCH */
-    reg[11:0] tr, tg;
     always @(*) begin // Display logic
-        tr = (x_mov * 15 / 639);
-        tg = (y * 15 / 479);
+        r = 0;
+        g = 0;
+        b = 0;
         if(de == 1) begin
-            r = tr[3:0];
-            g = tg[3:0];
+            r = x_mov[8:5];
+            g = y[8:5];
             b = 15 - r;
         end
     end
@@ -61,5 +61,5 @@ module tt_um_pong (
         end
     end
 
-    wire _unused = &{ui_in, uio_in, ena, tr[11:4], tg[11:4], 1'b0};
+    wire _unused = &{ui_in, uio_in, ena, x_mov[4:0], y[4:0], x_mov[10:9], y[10:9], 1'b0};
 endmodule
