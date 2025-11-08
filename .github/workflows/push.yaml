@@ -3,23 +3,7 @@ name: push
 on: [push, workflow_dispatch]
 
 jobs:
-  test:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install iverilog
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install -y iverilog
-
-      - name: Run tests
-        shell: bash
-        run: echo "TODO"
   gds:
-    needs: test
     runs-on: ubuntu-24.04
     steps:
       - name: checkout repo
@@ -51,6 +35,8 @@ jobs:
   release:
     needs: gds
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Zip
         run: |
@@ -66,4 +52,4 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: release.zip
+          artifact: release.zip
