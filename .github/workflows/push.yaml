@@ -50,6 +50,6 @@ jobs:
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag: ${{ github.run_id }}
+          name: Release ${{ github.run_id }}
           artifact: release.zip
