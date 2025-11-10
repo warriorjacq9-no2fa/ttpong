@@ -1,15 +1,24 @@
 TAG := $(shell curl -s https://api.github.com/repos/warriorjacq9-no2fa/ttpong/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+TAG_PDK := $(shell curl -s https://api.github.com/repos/warriorjacq9-no2fa/sky130-gltest/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
-VERILOG_SRCS = build/release/tt_um_pong.v
-VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+PDK_ROOT = $(PWD)/build/pdk
+
+VERILOG_SRCS = $(PWD)/build/release/tt_um_pong.v
+VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives__functional.v
+VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd__functional.v
 
 all: gl
 
-gl: release
-	
+gl: release build/pdk/.installed
+	make -C ../vga-test all VERILOG_SRCS="$(VERILOG_SRCS)" TOP_MODULE="tt_um_pong" DEFINES="-DGL_TEST"
 
 release:
 	mkdir -p build/release
 	curl -sfSL -o build/release.zip https://github.com/warriorjacq9-no2fa/ttpong/releases/download/$(TAG)/release.zip
 	bsdtar -xf build/release.zip --strip-components=1 -C build/release
+
+build/pdk/.installed:
+	mkdir -p build/pdk
+	curl -sfSL -o build/sky130A.tar.gz https://github.com/warriorjacq9-no2fa/sky130-gltest/releases/download/$(TAG_PDK)/sky130A.tar.gz
+	tar -xf build/sky130A.tar.gz -C build/pdk
+	touch build/pdk/.installed
