@@ -46,7 +46,7 @@ jobs:
       - name: Prep release
         run: |
           zip -r release.zip tt_submission
-          echo "RELEASE_DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+          echo "RELEASE_DATE=$(date +'%Y.%m.%d.%H%M%S')" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
