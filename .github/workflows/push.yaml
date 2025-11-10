@@ -43,13 +43,14 @@ jobs:
         with:
           name: tt_submission
       
-      - name: Zip artifact
+      - name: Prep release
         run: |
           zip -r release.zip tt_submission
+          echo "RELEASE_DATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.run_id }}
-          name: Release ${{ github.run_id }}
+          tag: ${{ env.RELEASE_DATE }}
+          name: Release ${{ env.RELEASE_DATE }}
           artifact: release.zip
