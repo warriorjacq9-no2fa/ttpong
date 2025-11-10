@@ -33,7 +33,7 @@ jobs:
       - uses: TinyTapeout/tt-gds-action/viewer@ttsky25b
   
   release:
-    needs: gds
+    needs: [precheck, viewer]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
