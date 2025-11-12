@@ -1,12 +1,15 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:latest",
-    "features": {
-    "ghcr.io/devcontainers/features/desktop-lite:1": {}
-    },
-    "forwardPorts": [6080],
-    "portsAttributes": {
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "start": true,
+      "webPort": 6080
+    }
+  },
+  "forwardPorts": [6080],
+  "portsAttributes": {
     "6080": {
-      "label": "desktop"
+      "label": "Desktop"
     }
   }
 }
