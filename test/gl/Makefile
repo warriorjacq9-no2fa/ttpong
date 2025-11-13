@@ -10,15 +10,15 @@ VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_s
 all: gl
 
 gl: release build/pdk/.installed
-	make -C ../vga-test all VERILOG_SRCS="$(VERILOG_SRCS)" TOP_MODULE="tt_um_pong" \
-	DEFINES="-DGL_TEST -Wno-DECLFILENAME -Wno-UNDRIVEN -Wno-UNUSEDSIGNAL"
+	iverilog -DFUNCTIONAL -DGL_TEST -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1 \
+	$(VERILOG_SRCS) tb.v -o tb.vvp
+	vvp tb.vvp
+	gtkwave tb.vcd tb.gtkw
 
 release:
 	mkdir -p build/release
 	curl -sfSL -o build/release.zip https://github.com/warriorjacq9-no2fa/ttpong/releases/download/$(TAG)/release.zip
 	bsdtar -xf build/release.zip --strip-components=1 -C build/release
-	sed -i -E -f release.sed build/release/tt_um_pong.v
-	sed -i -E ':a;N;$$!ba;s/,\s*\)/\)/g' build/release/tt_um_pong.v
 
 build/pdk/.installed:
 	mkdir -p build/pdk
