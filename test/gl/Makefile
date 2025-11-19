@@ -10,8 +10,7 @@ VERILOG_SRCS += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_s
 all: gl
 
 gl: release build/pdk/.installed
-	iverilog -DFUNCTIONAL -DGL_TEST -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1 \
-	$(VERILOG_SRCS) tb.v -o tb.vvp
+	$(MAKE) -C vga-gl TOP_MODULE="tt_um_pong" VERILOG_SRCS="$(VERILOG_SRCS)"
 	vvp tb.vvp
 	gtkwave tb.vcd tb.gtkw
 
