@@ -11,8 +11,12 @@ all: gl
 
 gl: release build/pdk/.installed
 	$(MAKE) -C vga-gl TOP_MODULE="tt_um_pong" VERILOG_SRCS="$(VERILOG_SRCS)"
+
+nodisp: release build/pdk/.installed
+	iverilog tb.v $(VERILOG_SRCS) -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1
 	vvp tb.vvp
 	gtkwave tb.vcd tb.gtkw
+
 
 release:
 	mkdir -p build/release
