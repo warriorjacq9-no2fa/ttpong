@@ -1,5 +1,4 @@
 TAG := $(shell curl -s https://api.github.com/repos/warriorjacq9-no2fa/ttpong/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-TAG_PDK := $(shell curl -s https://api.github.com/repos/warriorjacq9-no2fa/sky130-gltest/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 PDK_ROOT = $(PWD)/test/gl/build/pdk
 
@@ -25,8 +24,8 @@ release:
 
 build/pdk/.installed:
 	mkdir -p build/pdk
-	curl -sfSL -o build/sky130A.tar.gz https://github.com/warriorjacq9-no2fa/sky130-gltest/releases/download/$(TAG_PDK)/sky130A.tar.gz
-	tar -xf build/sky130A.tar.gz -C build/pdk
+	curl -sfSL -o build/sky130.tar.zst https://github.com/fossi-foundation/ciel-releases/releases/download/sky130-0fe599b2afb6708d281543108caf8310912f54af/sky130_fd_sc_hd.tar.zst
+	tar -xf build/sky130.tar.zst -C build/pdk
 	touch build/pdk/.installed
 
 clean:
