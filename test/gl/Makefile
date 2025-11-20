@@ -13,7 +13,7 @@ gl: release build/pdk/.installed
 	$(MAKE) -C vga-gl TOP_MODULE="tt_um_pong" VERILOG_SRCS="$(VERILOG_SRCS)"
 
 nodisp: release build/pdk/.installed
-	iverilog tb.v $(VERILOG_SRCS) -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1
+	iverilog tb.v $(VERILOG_SRCS) -DFUNCTIONAL -DUSE_POWER_PINS -DSIM -DUNIT_DELAY=\#1 -o tb.vvp
 	vvp tb.vvp
 	gtkwave tb.vcd tb.gtkw
 
@@ -28,3 +28,7 @@ build/pdk/.installed:
 	curl -sfSL -o build/sky130A.tar.gz https://github.com/warriorjacq9-no2fa/sky130-gltest/releases/download/$(TAG_PDK)/sky130A.tar.gz
 	tar -xf build/sky130A.tar.gz -C build/pdk
 	touch build/pdk/.installed
+
+clean:
+	make -C vga-gl clean
+	rm -rf *.vcd *.vvp build/

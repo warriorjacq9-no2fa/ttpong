@@ -5,3 +5,7 @@ vga-test:
 
 gl:
 	make -C test/gl all
+
+clean:
+	make -C test/gl clean
+	make -C test/vga-test clean
