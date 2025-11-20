@@ -10,14 +10,16 @@ module tt_um_pong (
     input  wire       rst_n     // reset_n - low to reset
 );
 
+    localparam BKG_R = 4'hF;
+    localparam BKG_G = 4'hF;
+    localparam BKG_B = 4'hC;
+
     assign uio_oe = 8'b0;
 
     reg [3:0] r, g, b;
     wire [10:0] x, y;
     wire de;
     wire hsync, vsync;
-    reg [10:0] counter;
-    wire [10:0] x_mov = counter + x;
 
     assign uo_out[7:0] = {g[3:0], r[3:0]};
     assign uio_out[3:0] = b[3:0];
@@ -35,6 +37,20 @@ module tt_um_pong (
         .rst_n(rst_n)
 	);
 
+    wire s1_en;
+    reg [3:0] s1_r, s1_g, s1_b;
+
+    sprite #(.R(4'h8), .G(4'h1), .B(4'h1)) s1(
+        .x(x),
+        .y(y),
+        .sx(320),
+        .sy(240),
+        .r(s1_r),
+        .g(s1_g),
+        .b(s1_b),
+        .en(s1_en)
+    );
+
 
     /* verilator lint_off LATCH */
     always @(*) begin // Display logic
@@ -42,24 +58,17 @@ module tt_um_pong (
         g = 0;
         b = 0;
         if(de == 1) begin
-            r = x_mov[8:5];
-            g = y[8:5];
-            b = 15 - r;
+            if(s1_en == 1) begin
+                r = s1_r;
+                g = s1_g;
+                b = s1_b;
+            end else begin
+                r = BKG_R;
+                g = BKG_G;
+                b = BKG_B;
+            end
         end
     end
 
-    reg vsync_d;
-
-    always @(posedge clk or negedge rst_n) begin
-        if (~rst_n) begin
-            vsync_d <= 0;
-            counter <= 0;
-        end else begin
-            vsync_d <= vsync; // delay version
-            if (vsync && !vsync_d)
-                counter <= counter + 1; // rising edge detect
-        end
-    end
-
-    wire _unused = &{ui_in, uio_in, ena, x_mov[4:0], y[4:0], x_mov[10:9], y[10:9], 1'b0};
+    wire _unused = &{ui_in, uio_in, ena, 1'b0};
 endmodule
