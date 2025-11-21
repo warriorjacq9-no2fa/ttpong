@@ -13,7 +13,9 @@ It uses a custom VGA sync module to generate VGA sync signals, then uses pixel-c
 
 ## How to test
 
-press the P1SRV button to start the game, control with up and down.
+Press the P1SRV button to start the game, control with up and down.
+
+Please note: although 25 MHz is indicated, 25.175 is the intended frequency. The Tiny Tapeout docs tool only supports integer freqeuncies.
 
 ## External hardware
 
