@@ -16,7 +16,7 @@ module vga
     input  wire clk,
     
     output reg hsync, vsync,
-    output reg [10:0] x, y,
+    output reg [9:0] x, y,
     output reg de,
 
 	input wire rst_n
@@ -25,7 +25,7 @@ module vga
 
     // next state regs
     reg hsync_next, vsync_next;
-    reg [10:0] x_next, y_next;
+    reg [9:0] x_next, y_next;
     reg active_area_next;
     
     // sequential logic

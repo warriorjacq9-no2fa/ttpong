@@ -6,8 +6,8 @@ module sprite #(
     B = 2'b11
 )
 (
-    input reg [10:0] x, y,
-    input reg [10:0] sx, sy,
+    input reg [9:0] x, y,
+    input reg [9:0] sx, sy,
     output wire [1:0] r, g, b,
     output wire en
 );

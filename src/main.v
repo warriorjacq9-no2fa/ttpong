@@ -17,7 +17,7 @@ module tt_um_pong (
     assign uio_oe = 8'b0;
 
     reg [1:0] r, g, b;
-    wire [10:0] x, y;
+    wire [9:0] x, y;
     wire de;
     wire hsync, vsync;
 
@@ -36,20 +36,61 @@ module tt_um_pong (
         .rst_n(rst_n)
 	);
 
-    wire s1_en;
-    reg [1:0] s1_r, s1_g, s1_b;
+    wire p1_en;
+    wire [1:0] p1_r, p1_g, p1_b;
+    reg [9:0] p1_x, p1_y;
 
-    sprite #(.R(2'b01), .G(2'b00), .B(2'b00)) s1(
+    sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p1(
         .x(x),
         .y(y),
-        .sx(11'd320),
-        .sy(11'd240),
-        .r(s1_r),
-        .g(s1_g),
-        .b(s1_b),
-        .en(s1_en)
+        .sx(p1_x),
+        .sy(p1_y),
+        .r(p1_r),
+        .g(p1_g),
+        .b(p1_b),
+        .en(p1_en)
     );
 
+    wire p2_en;
+    wire [1:0] p2_r, p2_g, p2_b;
+    reg [9:0] p2_x, p2_y;
+
+    sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p2(
+        .x(x),
+        .y(y),
+        .sx(p2_x),
+        .sy(p2_y),
+        .r(p2_r),
+        .g(p2_g),
+        .b(p2_b),
+        .en(p2_en)
+    );
+
+    wire ball_en;
+    wire [1:0] ball_r, ball_g, ball_b;
+    reg [9:0] ball_x, ball_y;
+
+    sprite #(.R(2'b01), .G(2'b00), .B(2'b00)) ball(
+        .x(x),
+        .y(y),
+        .sx(ball_x),
+        .sy(ball_y),
+        .r(ball_r),
+        .g(ball_g),
+        .b(ball_b),
+        .en(ball_en)
+    );
+
+    always @(negedge rst_n) begin
+        p1_x <= 10'd40;
+        p1_y <= 10'd240;
+
+        p2_x <= 10'd600;
+        p2_y <= 10'd240;
+
+        ball_x <= 10'd320;
+        ball_y <= 10'd240;
+    end
 
     /* verilator lint_off LATCH */
     always @(*) begin // Display logic
@@ -57,10 +98,18 @@ module tt_um_pong (
         g = 0;
         b = 0;
         if(de == 1) begin
-            if(s1_en == 1) begin
-                r = s1_r;
-                g = s1_g;
-                b = s1_b;
+            if(p1_en == 1) begin
+                r = p1_r;
+                g = p1_g;
+                b = p1_b;
+            end else if(p2_en == 1) begin
+                r = p2_r;
+                g = p2_g;
+                b = p2_b;
+            end else if(ball_en == 1) begin
+                r = ball_r;
+                g = ball_g;
+                b = ball_b;
             end else begin
                 r = BKG_R;
                 g = BKG_G;
