@@ -10,20 +10,19 @@ module tt_um_pong (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    localparam BKG_R = 4'hF;
-    localparam BKG_G = 4'hF;
-    localparam BKG_B = 4'hC;
+    localparam BKG_R = 2'b11;
+    localparam BKG_G = 2'b11;
+    localparam BKG_B = 2'b10;
 
     assign uio_oe = 8'b0;
 
-    reg [3:0] r, g, b;
+    reg [1:0] r, g, b;
     wire [10:0] x, y;
     wire de;
     wire hsync, vsync;
 
-    assign uo_out[7:0] = {g[3:0], r[3:0]};
-    assign uio_out[3:0] = b[3:0];
-    assign uio_out[7:4] = {1'b0, de, vsync, hsync};
+    assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
+    assign uio_out[7:0] = {de, 7'b0};
 
 
     // ******************** GRAPHICS ********************
