@@ -21,6 +21,11 @@ module tt_um_pong (
     wire de;
     wire hsync, vsync;
 
+    wire p1up, p1dn, p1srv;
+    wire p2up, p2dn, p2srv;
+
+    assign {p2srv, p2dn, p2up, p1srv, p1dn, p1up} = ui_in[5:0];
+
     assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
     assign uio_out[7:0] = {de, 7'b0};
 
@@ -116,7 +121,19 @@ module tt_um_pong (
                 b = BKG_B;
             end
         end
+        if(p1_up == 1) begin
+            p1_y += 1;
+        end
+        if(p1_dn == 1) begin
+            p1_y -= 1;
+        end
+        if(p2_up == 1) begin
+            p2_y += 1;
+        end
+        if(p2_dn == 1) begin
+            p2_y -= 1;
+        end
     end
 
-    wire _unused = &{ui_in, uio_in, ena, 1'b0};
+    wire _unused = &{ui_in[7:6], uio_in, ena, 1'b0};
 endmodule
