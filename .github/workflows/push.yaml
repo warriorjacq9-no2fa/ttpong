@@ -3,6 +3,16 @@ name: push
 on: [push, workflow_dispatch]
 
 jobs:
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build docs
+        uses: TinyTapeout/tt-gds-action/docs@ttsky25b
   gds:
     runs-on: ubuntu-24.04
     steps:
