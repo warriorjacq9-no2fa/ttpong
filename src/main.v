@@ -37,7 +37,7 @@ module tt_um_pong (
 	);
 
     wire s1_en;
-    reg [3:0] s1_r, s1_g, s1_b;
+    reg [1:0] s1_r, s1_g, s1_b;
 
     sprite #(.R(4'h8), .G(4'h1), .B(4'h1)) s1(
         .x(x),
