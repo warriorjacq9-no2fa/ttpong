@@ -39,11 +39,11 @@ module tt_um_pong (
     wire s1_en;
     reg [1:0] s1_r, s1_g, s1_b;
 
-    sprite #(.R(4'h8), .G(4'h1), .B(4'h1)) s1(
+    sprite #(.R(2'b01), .G(2'b00), .B(2'b00)) s1(
         .x(x),
         .y(y),
-        .sx(320),
-        .sy(240),
+        .sx(11'd320),
+        .sy(11'd240),
         .r(s1_r),
         .g(s1_g),
         .b(s1_b),
