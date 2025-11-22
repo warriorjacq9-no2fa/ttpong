@@ -113,7 +113,7 @@ module tt_um_pong (
     end
 
     always @(posedge clk or negedge rst_n) begin
-        if(rst_n == 0) begin
+        if(!rst_n) begin
             p1_x <= 10'd40;
             p1_y <= 10'd240;
 
@@ -122,18 +122,19 @@ module tt_um_pong (
 
             ball_x <= 10'd320;
             ball_y <= 10'd240;
-        end
-        if(p1_up == 1) begin
-            p1_y <= p1_y + 1;
-        end
-        if(p1_dn == 1) begin
-            p1_y <= p1_y - 1;
-        end
-        if(p2_up == 1) begin
-            p2_y <= p2_y + 1;
-        end
-        if(p2_dn == 1) begin
-            p2_y <= p2_y - 1;
+        end else begin
+            if(p1_up) begin
+                p1_y <= p1_y + 1;
+            end
+            if(p1_dn) begin
+                p1_y <= p1_y - 1;
+            end
+            if(p2_up) begin
+                p2_y <= p2_y + 1;
+            end
+            if(p2_dn) begin
+                p2_y <= p2_y - 1;
+            end
         end
     end
 
