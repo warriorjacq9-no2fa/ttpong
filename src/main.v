@@ -21,10 +21,10 @@ module tt_um_pong (
     wire de;
     wire hsync, vsync;
 
-    wire p1up, p1dn, p1srv;
-    wire p2up, p2dn, p2srv;
+    wire p1_up, p1_dn, p1_srv;
+    wire p2_up, p2_dn, p2_srv;
 
-    assign {p2srv, p2dn, p2up, p1srv, p1dn, p1up} = ui_in[5:0];
+    assign {p2_srv, p2_dn, p2_up, p1_srv, p1_dn, p1_up} = ui_in[5:0];
 
     assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
     assign uio_out[7:0] = {de, 7'b0};
@@ -86,17 +86,6 @@ module tt_um_pong (
         .en(ball_en)
     );
 
-    always @(negedge rst_n) begin
-        p1_x <= 10'd40;
-        p1_y <= 10'd240;
-
-        p2_x <= 10'd600;
-        p2_y <= 10'd240;
-
-        ball_x <= 10'd320;
-        ball_y <= 10'd240;
-    end
-
     /* verilator lint_off LATCH */
     always @(*) begin // Display logic
         r = 0;
@@ -121,19 +110,32 @@ module tt_um_pong (
                 b = BKG_B;
             end
         end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if(rst_n == 0) begin
+            p1_x <= 10'd40;
+            p1_y <= 10'd240;
+
+            p2_x <= 10'd600;
+            p2_y <= 10'd240;
+
+            ball_x <= 10'd320;
+            ball_y <= 10'd240;
+        end
         if(p1_up == 1) begin
-            p1_y += 1;
+            p1_y <= p1_y + 1;
         end
         if(p1_dn == 1) begin
-            p1_y -= 1;
+            p1_y <= p1_y - 1;
         end
         if(p2_up == 1) begin
-            p2_y += 1;
+            p2_y <= p2_y + 1;
         end
         if(p2_dn == 1) begin
-            p2_y -= 1;
+            p2_y <= p2_y - 1;
         end
     end
 
-    wire _unused = &{ui_in[7:6], uio_in, ena, 1'b0};
+    wire _unused = &{ui_in[7:6], uio_in, ena, p1_srv, p2_srv, 1'b0};
 endmodule
