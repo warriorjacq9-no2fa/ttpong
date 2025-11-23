@@ -15,8 +15,6 @@ It uses a custom VGA sync module to generate VGA sync signals, then uses pixel-c
 
 Press the P1SRV button to start the game, control with up and down.
 
-Please note: although 25 MHz is indicated, 25.175 is the intended frequency. The Tiny Tapeout docs tool only supports integer freqeuncies.
-
 ## External hardware
 
 TinyVGA PMOD, 6 buttons, 6 pullup resistors (10K) connected from button "output" to 3.3v. Optionally 6 100nF capacitors connected to the button "output" and ground, combined with 6 1K resistors in series from the button to the chip inputs, for debouncing.
