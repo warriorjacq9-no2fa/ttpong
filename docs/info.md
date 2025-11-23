@@ -13,7 +13,15 @@ It uses a custom VGA sync module to generate VGA sync signals, then uses pixel-c
 
 ## How to test
 
-Press the P1SRV button to start the game, control with up and down.
+### Software:
+
+Use `make` to run the included vga-test submodule to run a graphical test in real time. Use `make gl` to run a gate-level test with the included vga-gl submodule.
+
+Note: gate-level testing is not in real time, and presimulates the inputs and outputs. It also takes much longer to start, but will run at 60fps, as opposed to the variable fps of vga-test.
+
+### Hardware:
+
+Attach all external hardware. Be sure to enable reset. Press the P1SRV button to start the game, control with up and down.
 
 ## External hardware
 
