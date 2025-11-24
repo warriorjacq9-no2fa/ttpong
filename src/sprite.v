@@ -19,8 +19,6 @@ module sprite #( parameter
         (x > sx - WIDTH_2 && x < sx + WIDTH_2) &&
         (y > sy - HEIGHT_2 && y < sy + HEIGHT_2)
     );
-    assign r = {2{en}} & R;
-    assign g = {2{en}} & G;
-    assign b = {2{en}} & B;
+    assign {r, g, b} = en ? {R, G, B} : 6'bxxxxxx;
 
 endmodule
