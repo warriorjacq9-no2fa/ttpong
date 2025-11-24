@@ -29,5 +29,5 @@ build/pdk/.installed:
 	touch build/pdk/.installed
 
 clean:
-	make -C vga-gl clean
+	$(MAKE) -C vga-gl clean
 	rm -rf *.vcd *.vvp build/
