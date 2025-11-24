@@ -29,7 +29,7 @@ initial begin
     clk <= 1'b0;
     repeat(3) @(posedge clk);
     rst_n <= 1'b1;
-    repeat(420000) @(posedge clk);
+    repeat(420000 * 2) @(posedge clk);
     $finish();
 end
 
