@@ -1,4 +1,4 @@
-module sprite #(
+module sprite #( parameter
     WIDTH = 10,
     HEIGHT = 10,
     R = 2'b11,
