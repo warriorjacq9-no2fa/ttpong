@@ -24,15 +24,15 @@ module vga
 
 
     // next state regs
-    reg hsync_next, vsync_next;
     reg [9:0] x_next, y_next;
-    reg active_area_next;
+    wire hsync_next = ~(ACTIVE_WIDTH + H_FP <= x_next && x_next < TOTAL_WIDTH - H_BP);
+    wire vsync_next = ~(ACTIVE_HEIGHT + V_FP <= y_next && y_next < TOTAL_HEIGHT - V_BP);
+    wire active_area_next = (x_next < ACTIVE_WIDTH && y_next < ACTIVE_HEIGHT);
     
     // sequential logic
     always @(posedge clk or negedge rst_n)
     begin
-        if(~rst_n)
-        begin
+        if(~rst_n) begin
             hsync <= 0;
             vsync <= 0;
             x <= 0;
@@ -48,13 +48,8 @@ module vga
     end
     
     // combinational logic
-    always @(*)
-    begin
-        hsync_next = ~(ACTIVE_WIDTH + H_FP <= x && x < TOTAL_WIDTH - H_BP);
-        vsync_next = ~(ACTIVE_HEIGHT + V_FP <= y && y < TOTAL_HEIGHT - V_BP);
-        
-        if(x == TOTAL_WIDTH - 1)
-        begin
+    always @(*) begin
+        if(x == TOTAL_WIDTH - 1) begin
             x_next = 0;
             if(y == TOTAL_HEIGHT - 1)
                 y_next = 0;
@@ -64,10 +59,5 @@ module vga
             x_next = x + 1;
             y_next = y;
         end
-            
-            
-        active_area_next = x < ACTIVE_WIDTH && y < ACTIVE_HEIGHT;
     end
-
-
 endmodule

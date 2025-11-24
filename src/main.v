@@ -43,12 +43,12 @@ module tt_um_pong (
 
     wire p1_en;
     wire [1:0] p1_r, p1_g, p1_b;
-    reg [9:0] p1_x, p1_y;
+    reg [8:0] p1_y;
 
     sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p1(
         .x(x),
         .y(y),
-        .sx(p1_x),
+        .sx(40),
         .sy(p1_y),
         .r(p1_r),
         .g(p1_g),
@@ -58,12 +58,12 @@ module tt_um_pong (
 
     wire p2_en;
     wire [1:0] p2_r, p2_g, p2_b;
-    reg [9:0] p2_x, p2_y;
+    reg [8:0] p2_y;
 
     sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p2(
         .x(x),
         .y(y),
-        .sx(p2_x),
+        .sx(600),
         .sy(p2_y),
         .r(p2_r),
         .g(p2_g),
@@ -73,7 +73,8 @@ module tt_um_pong (
 
     wire ball_en;
     wire [1:0] ball_r, ball_g, ball_b;
-    reg [9:0] ball_x, ball_y;
+    reg [9:0] ball_x;
+    reg [8:0] ball_y;
 
     sprite #(.R(2'b01), .G(2'b00), .B(2'b00)) ball(
         .x(x),
@@ -85,6 +86,8 @@ module tt_um_pong (
         .b(ball_b),
         .en(ball_en)
     );
+
+    reg p1_ir, p1_dr, p2_ir, p2_dr;
 
     /* verilator lint_off LATCH */
     always @(*) begin // Display logic
@@ -110,31 +113,34 @@ module tt_um_pong (
                 b = BKG_B;
             end
         end
+        p1_ir = p1_up;
+        p1_dr = p1_dn;
+        p2_ir = p2_up;
+        p2_dr = p2_dn;
     end
+
+    reg sel_p1;
+    wire signed [1:0] delta = 
+        (sel_p1 ? (p1_ir - p1_dr) : (p2_ir - p2_dr));
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            p1_x <= 10'd40;
-            p1_y <= 10'd240;
+            p1_y <= 9'd240;
 
-            p2_x <= 10'd600;
-            p2_y <= 10'd240;
+            p2_y <= 9'd240;
 
             ball_x <= 10'd320;
-            ball_y <= 10'd240;
+            ball_y <= 9'd240;
+
+            sel_p1 <= 1'b0;
         end else begin
-            if(p1_up) begin
-                p1_y <= p1_y + 1;
+            if(sel_p1) begin
+                p1_y <= p1_y + {{7{delta[1]}}, delta};
+            end else begin
+                p2_y <= p2_y + {{7{delta[1]}}, delta};
             end
-            if(p1_dn) begin
-                p1_y <= p1_y - 1;
-            end
-            if(p2_up) begin
-                p2_y <= p2_y + 1;
-            end
-            if(p2_dn) begin
-                p2_y <= p2_y - 1;
-            end
+
+            sel_p1 <= ~sel_p1;
         end
     end
 
