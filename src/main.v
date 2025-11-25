@@ -10,9 +10,13 @@ module tt_um_pong (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-    localparam BKG_R = 2'b11;
-    localparam BKG_G = 2'b11;
-    localparam BKG_B = 2'b10;
+    localparam BKG_R = 2'b00;
+    localparam BKG_G = 2'b00;
+    localparam BKG_B = 2'b00;
+
+    localparam SPR_R = 2'b00;
+    localparam SPR_G = 2'b01;
+    localparam SPR_B = 2'b00;
 
     assign uio_oe = 8'b0;
 
@@ -41,11 +45,19 @@ module tt_um_pong (
         .rst_n(rst_n)
 	);
 
-    wire p1_en;
+    wire p1_en, p2_en, ball_en;
+
     wire [1:0] p1_r, p1_g, p1_b;
     reg [8:0] p1_y;
 
-    sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p1(
+    wire [1:0] p2_r, p2_g, p2_b;
+    reg [8:0] p2_y;
+
+    wire [1:0] ball_r, ball_g, ball_b;
+    reg [9:0] ball_x;
+    reg [8:0] ball_y;
+
+    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p1(
         .x(x),
         .y(y),
         .sx(40),
@@ -56,11 +68,7 @@ module tt_um_pong (
         .en(p1_en)
     );
 
-    wire p2_en;
-    wire [1:0] p2_r, p2_g, p2_b;
-    reg [8:0] p2_y;
-
-    sprite #(.R(2'b01), .G(2'b00), .B(2'b00), .HEIGHT(50)) p2(
+    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p2(
         .x(x),
         .y(y),
         .sx(600),
@@ -71,12 +79,7 @@ module tt_um_pong (
         .en(p2_en)
     );
 
-    wire ball_en;
-    wire [1:0] ball_r, ball_g, ball_b;
-    reg [9:0] ball_x;
-    reg [8:0] ball_y;
-
-    sprite #(.R(2'b01), .G(2'b00), .B(2'b00)) ball(
+    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B)) ball(
         .x(x),
         .y(y),
         .sx(ball_x),
