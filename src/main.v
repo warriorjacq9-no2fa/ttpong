@@ -18,6 +18,9 @@ module tt_um_pong (
     localparam SPR_G = 2'b01;
     localparam SPR_B = 2'b00;
 
+    localparam P_SPD = 3;
+    localparam B_SPD = 3;
+
     assign uio_oe = 8'b0;
 
     reg [1:0] r, g, b;
@@ -90,7 +93,31 @@ module tt_um_pong (
         .en(ball_en)
     );
 
-    reg p1_ir, p1_dr, p2_ir, p2_dr;
+    // ******************* COLLISIONS *******************
+
+    reg signed [1:0] b_delta;
+    wire p1_c, p2_c;
+
+    coll #(.HEIGHT_1(50)) p1_cd(
+        .s1x(40),
+        .s1y(p1_y),
+        .s2x(ball_x),
+        .s2y(ball_y),
+        .coll(p1_c)
+    );
+
+    coll #(.HEIGHT_1(50)) p2_cd(
+        .s1x(600),
+        .s1y(p2_y),
+        .s2x(ball_x),
+        .s2y(ball_y),
+        .coll(p2_c)
+    );
+
+    // ******************** GAMEPLAY ********************
+
+    reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
+    reg siderst;
 
     /* verilator lint_off LATCH */
     always @(*) begin // Display logic
@@ -116,34 +143,63 @@ module tt_um_pong (
                 b = BKG_B;
             end
         end
-        p1_ir = p1_up;
-        p1_dr = p1_dn;
-        p2_ir = p2_up;
-        p2_dr = p2_dn;
+
+        if(p1_srv && side[1]) begin
+            b_delta = 2'b01;
+            siderst = 1;
+        end else if(p2_srv && side[0]) begin
+            b_delta = 2'b11;
+            siderst = 1;
+        end
+
+        if(p1_c) begin
+            b_delta = 2'b01;
+        end else if(p2_c) begin
+            b_delta = 2'b11;
+        end
     end
 
     reg sel_p1;
     wire signed [1:0] delta = 
-        (sel_p1 ? (p1_ir - p1_dr) : (p2_ir - p2_dr));
+        (sel_p1 ? (p1_up - p1_dn) : (p2_up - p2_dn));
 
-    always @(posedge clk or negedge rst_n) begin
+// Since VGA_TEST runs at ~30FPS due to computation limits, run at double
+// speeds when under it. This won't affect production testing.
+`ifdef VGA_TEST
+    localparam _P_SPD = P_SPD + 1;
+`else
+    localparam _P_SPD = P_SPD;
+`endif
+
+`ifdef VGA_TEST
+    localparam _B_SPD = B_SPD + 1;
+`else
+    localparam _B_SPD = B_SPD;
+`endif
+
+    always @(negedge vsync or negedge rst_n) begin
         if(!rst_n) begin
             p1_y <= 9'd240;
 
             p2_y <= 9'd240;
 
-            ball_x <= 10'd320;
+            ball_x <= 10'd575;
             ball_y <= 9'd240;
 
             sel_p1 <= 1'b0;
+
+            side <= 2'b01;
         end else begin
             if(sel_p1) begin
-                p1_y <= p1_y + {{7{delta[1]}}, delta};
+                p1_y <= p1_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
             end else begin
-                p2_y <= p2_y + {{7{delta[1]}}, delta};
+                p2_y <= p2_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
             end
 
+            ball_x <= ball_x + {{8-_B_SPD{b_delta[1]}}, b_delta, {_B_SPD{1'b0}}};
+
             sel_p1 <= ~sel_p1;
+            if(siderst) side <= 2'b0;
         end
     end
 
