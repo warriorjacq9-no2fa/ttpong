@@ -177,7 +177,10 @@ module tt_um_pong (
     localparam _B_SPD = B_SPD;
 `endif
 
-    always @(negedge vsync or negedge rst_n) begin
+    reg vsync_prev;
+    wire vsync_negedge = vsync_prev && !vsync;
+
+    always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             p1_y <= 9'd240;
 
@@ -190,16 +193,20 @@ module tt_um_pong (
 
             side <= 2'b01;
         end else begin
-            if(sel_p1) begin
-                p1_y <= p1_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
-            end else begin
-                p2_y <= p2_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
+            vsync_prev <= vsync;
+        
+            if(vsync_negedge) begin
+                if(sel_p1) begin
+                    p1_y <= p1_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
+                end else begin
+                    p2_y <= p2_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
+                end
+
+                ball_x <= ball_x + {{8-_B_SPD{b_delta[1]}}, b_delta, {_B_SPD{1'b0}}};
+
+                sel_p1 <= ~sel_p1;
+                if(siderst) side <= 2'b0;
             end
-
-            ball_x <= ball_x + {{8-_B_SPD{b_delta[1]}}, b_delta, {_B_SPD{1'b0}}};
-
-            sel_p1 <= ~sel_p1;
-            if(siderst) side <= 2'b0;
         end
     end
 
