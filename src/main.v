@@ -116,14 +116,11 @@ module tt_um_pong (
 
     // ******************** GAMEPLAY ********************
 
-    reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
-    reg siderst;
-
-    /* verilator lint_off LATCH */
     always @(*) begin // Display logic
         r = 0;
         g = 0;
         b = 0;
+
         if(de == 1) begin
             if(p1_en == 1) begin
                 r = p1_r;
@@ -143,25 +140,12 @@ module tt_um_pong (
                 b = BKG_B;
             end
         end
-
-        if(p1_srv && side[1]) begin
-            b_delta = 2'b01;
-            siderst = 1;
-        end else if(p2_srv && side[0]) begin
-            b_delta = 2'b11;
-            siderst = 1;
-        end
-
-        if(p1_c) begin
-            b_delta = 2'b01;
-        end else if(p2_c) begin
-            b_delta = 2'b11;
-        end
     end
 
     reg sel_p1;
     wire signed [1:0] delta = 
         (sel_p1 ? (p1_up - p1_dn) : (p2_up - p2_dn));
+    reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
 
 // Since VGA_TEST runs at ~30FPS due to computation limits, run at double
 // speeds when under it. This won't affect production testing.
@@ -188,14 +172,30 @@ module tt_um_pong (
 
             ball_x <= 10'd575;
             ball_y <= 9'd240;
+            b_delta <= 2'b0;
 
             sel_p1 <= 1'b0;
 
             side <= 2'b01;
         end else begin
+            if(p1_srv && side[1]) begin
+                b_delta <= 2'b01;
+                side <= 2'b0;
+            end else if(p2_srv && side[0]) begin
+                b_delta <= 2'b11;
+                side <= 2'b0;
+            end
+
+            if(p1_c) begin
+                b_delta <= 2'b01;
+            end else if(p2_c) begin
+                b_delta <= 2'b11;
+            end
+
             vsync_prev <= vsync;
         
             if(vsync_negedge) begin
+
                 if(sel_p1) begin
                     p1_y <= p1_y + {{7-_P_SPD{delta[1]}}, delta, {_P_SPD{1'b0}}};
                 end else begin
@@ -205,7 +205,6 @@ module tt_um_pong (
                 ball_x <= ball_x + {{8-_B_SPD{b_delta[1]}}, b_delta, {_B_SPD{1'b0}}};
 
                 sel_p1 <= ~sel_p1;
-                if(siderst) side <= 2'b0;
             end
         end
     end
