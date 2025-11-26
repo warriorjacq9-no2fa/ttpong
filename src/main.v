@@ -63,7 +63,7 @@ module tt_um_pong (
     sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p1(
         .x(x),
         .y(y),
-        .sx(40),
+        .sx(10'd40),
         .sy(p1_y),
         .r(p1_r),
         .g(p1_g),
@@ -74,7 +74,7 @@ module tt_um_pong (
     sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p2(
         .x(x),
         .y(y),
-        .sx(600),
+        .sx(10'd600),
         .sy(p2_y),
         .r(p2_r),
         .g(p2_g),
@@ -99,7 +99,7 @@ module tt_um_pong (
     wire p1_c, p2_c;
 
     coll #(.HEIGHT_1(50)) p1_cd(
-        .s1x(40),
+        .s1x(10'd40),
         .s1y(p1_y),
         .s2x(ball_x),
         .s2y(ball_y),
@@ -107,7 +107,7 @@ module tt_um_pong (
     );
 
     coll #(.HEIGHT_1(50)) p2_cd(
-        .s1x(600),
+        .s1x(10'd600),
         .s1y(p2_y),
         .s2x(ball_x),
         .s2y(ball_y),
