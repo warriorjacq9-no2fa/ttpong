@@ -9,6 +9,9 @@ supply1 pwr;
 
 tt_um_pong dut
 (
+    .ui_in(0),
+    .uio_in(0),
+    .ena(1),
     .rst_n (rst_n),
     .clk (clk),
     .VGND(gnd),
@@ -31,7 +34,7 @@ initial begin
     clk <= 1'b0;
     repeat(3) @(posedge clk);
     rst_n <= 1'b1;
-    repeat(420000) @(posedge clk);
+    repeat(420000 * 4) @(posedge clk);
     $finish();
 end
 
