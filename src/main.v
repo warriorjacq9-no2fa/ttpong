@@ -147,19 +147,8 @@ module tt_um_pong (
         (sel_p1 ? (p1_up - p1_dn) : (p2_up - p2_dn));
     reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
 
-// Since VGA_TEST runs at ~30FPS due to computation limits, run at double
-// speeds when under it. This won't affect production testing.
-`ifdef VGA_TEST
-    localparam _P_SPD = P_SPD + 1;
-`else
     localparam _P_SPD = P_SPD;
-`endif
-
-`ifdef VGA_TEST
-    localparam _B_SPD = B_SPD + 1;
-`else
     localparam _B_SPD = B_SPD;
-`endif
 
     reg vsync_prev;
     wire vsync_negedge = vsync_prev && !vsync;
