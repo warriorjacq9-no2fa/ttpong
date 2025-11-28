@@ -155,8 +155,9 @@ module tt_um_pong (
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            p1_y <= 9'd240;
+            vsync_prev <= 1'b0;
 
+            p1_y <= 9'd240;
             p2_y <= 9'd240;
 
             ball_x <= 10'd575;
