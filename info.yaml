@@ -33,7 +33,7 @@ pinout:
   ui[4]: "P2DN"
   ui[5]: "P2SRV"
   ui[6]: ""
-  ui[7]: ""
+  ui[7]: "SEL_STEREO"
 
   # Outputs
   uo[0]: "R1"
@@ -46,14 +46,14 @@ pinout:
   uo[7]: "HSYNC"
 
   # Bidirectional pins
-  uio[0]: ""
+  uio[0]: "DE"
   uio[1]: ""
   uio[2]: ""
   uio[3]: ""
   uio[4]: ""
   uio[5]: ""
-  uio[6]: ""
-  uio[7]: "DE"
+  uio[6]: "L"
+  uio[7]: "R/MONO"
 
 # Do not change!
 yaml_version: 6

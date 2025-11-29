@@ -34,7 +34,7 @@ module tt_um_pong (
     assign {p2_srv, p2_dn, p2_up, p1_srv, p1_dn, p1_up} = ui_in[5:0];
 
     assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
-    assign uio_out[7:0] = {de, 7'b0};
+    assign uio_out[7:0] = {7'b0, de};
 
 
     // ******************** GRAPHICS ********************
