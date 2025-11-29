@@ -33,7 +33,7 @@ pinout:
   ui[4]: "P2DN"
   ui[5]: "P2SRV"
   ui[6]: ""
-  ui[7]: "SEL_STEREO"
+  ui[7]: "STEREO_EN"
 
   # Outputs
   uo[0]: "R1"
