@@ -29,8 +29,7 @@ module tt_um_pong (
     wire [9:0] x, y;
     wire de;
     wire hsync, vsync;
-    wire a_low, a_high;
-    reg a_mono;
+    wire a_mono;
     
     wire p1_c, p2_c;
 
@@ -51,27 +50,20 @@ module tt_um_pong (
     wire beep_low = p1_c;
     wire beep_high = p2_c;
 
-    clkdiv #(.DIVISOR(65535)) clk_low( // ~384 Hz
-        .rst_n(rst_n),
-        .clk_in(clk),
-        .clk_out(a_low)
-    );
+    reg [15:0] tone_cnt;
 
-    clkdiv #(.DIVISOR(49151)) clk_high( // ~512 Hz
-        .rst_n(rst_n),
-        .clk_in(clk),
-        .clk_out(a_high)
-    );
-
-    always @(posedge clk) begin
-        if(beep_low) begin
-            a_mono <= a_low;
-        end else if(beep_high) begin
-            a_mono <= a_high;
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n) begin
+            tone_cnt <= 0;
         end else begin
-            a_mono <= 0;
+            tone_cnt <= tone_cnt + 1;
         end
     end
+
+    wire a_low  = tone_cnt[15];   // ~381 Hz
+    wire a_high = tone_cnt[14];   // ~762 Hz
+
+    assign a_mono = (beep_low ? a_low : (beep_high ? a_high : 0));
 
     // ******************** GRAPHICS ********************
     vga vga (
@@ -86,46 +78,34 @@ module tt_um_pong (
 
     wire p1_en, p2_en, ball_en;
 
-    wire [1:0] p1_r, p1_g, p1_b;
     reg [8:0] p1_y;
 
-    wire [1:0] p2_r, p2_g, p2_b;
     reg [8:0] p2_y;
 
-    wire [1:0] ball_r, ball_g, ball_b;
     reg [9:0] ball_x;
     reg [8:0] ball_y;
 
-    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p1(
+    sprite #(.HEIGHT(50)) p1(
         .x(x),
         .y(y),
         .sx(10'd40),
         .sy(p1_y),
-        .r(p1_r),
-        .g(p1_g),
-        .b(p1_b),
         .en(p1_en)
     );
 
-    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B), .HEIGHT(50)) p2(
+    sprite #(.HEIGHT(50)) p2(
         .x(x),
         .y(y),
         .sx(10'd600),
         .sy(p2_y),
-        .r(p2_r),
-        .g(p2_g),
-        .b(p2_b),
         .en(p2_en)
     );
 
-    sprite #(.R(SPR_R), .G(SPR_G), .B(SPR_B)) ball(
+    sprite ball(
         .x(x),
         .y(y),
         .sx(ball_x),
         .sy(ball_y),
-        .r(ball_r),
-        .g(ball_g),
-        .b(ball_b),
         .en(ball_en)
     );
 
@@ -158,17 +138,17 @@ module tt_um_pong (
 
         if(de == 1) begin
             if(p1_en == 1) begin
-                r = p1_r;
-                g = p1_g;
-                b = p1_b;
+                r = SPR_R;
+                g = SPR_G;
+                b = SPR_B;
             end else if(p2_en == 1) begin
-                r = p2_r;
-                g = p2_g;
-                b = p2_b;
+                r = SPR_R;
+                g = SPR_G;
+                b = SPR_B;
             end else if(ball_en == 1) begin
-                r = ball_r;
-                g = ball_g;
-                b = ball_b;
+                r = SPR_R;
+                g = SPR_G;
+                b = SPR_B;
             end else begin
                 r = BKG_R;
                 g = BKG_G;
