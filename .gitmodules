@@ -1,6 +1,8 @@
 [submodule "test/vga-test"]
 	path = test/vga-test
 	url = https://github.com/warriorjacq9-no2fa/vga-test.git
+	branch = noaudio
 [submodule "test/gl/vga-gl"]
 	path = test/gl/vga-gl
 	url = https://github.com/warriorjacq9-no2fa/vga-gl
+	branch = noaudio
