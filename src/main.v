@@ -23,19 +23,55 @@ module tt_um_pong (
 
     assign uio_oe = 8'b0;
 
+    wire pad;
+
     reg [1:0] r, g, b;
     wire [9:0] x, y;
     wire de;
     wire hsync, vsync;
+    wire a_low, a_high;
+    reg a_mono;
+    
+    wire p1_c, p2_c;
 
     wire p1_up, p1_dn, p1_srv;
     wire p2_up, p2_dn, p2_srv;
 
-    assign {p2_srv, p2_dn, p2_up, p1_srv, p1_dn, p1_up} = ui_in[5:0];
+    wire stereo_en;
+
+    assign {stereo_en, pad, p2_srv, p2_dn, p2_up, p1_srv, p1_dn, p1_up} = ui_in[7:0];
 
     assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
-    assign uio_out[7:0] = {7'b0, de};
+    assign uio_out[5:0] = {5'b0, de};
+    assign uio_out[7:6] = {a_mono, 1'b0};
 
+    // ********************** AUDIO *********************
+
+    // Set high when a beep is needed
+    wire beep_low = p1_c;
+    wire beep_high = p2_c;
+
+    clkdiv #(.DIVISOR(65535)) clk_low( // ~384 Hz
+        .rst_n(rst_n),
+        .clk_in(clk),
+        .clk_out(a_low)
+    );
+
+    clkdiv #(.DIVISOR(49151)) clk_high( // ~512 Hz
+        .rst_n(rst_n),
+        .clk_in(clk),
+        .clk_out(a_high)
+    );
+
+    always @(posedge clk) begin
+        if(beep_low) begin
+            a_mono <= a_low;
+        end else if(beep_high) begin
+            a_mono <= a_high;
+        end else begin
+            a_mono <= 0;
+        end
+    end
 
     // ******************** GRAPHICS ********************
     vga vga (
@@ -96,7 +132,6 @@ module tt_um_pong (
     // ******************* COLLISIONS *******************
 
     reg signed [1:0] b_delta;
-    wire p1_c, p2_c;
 
     coll #(.HEIGHT_1(50)) p1_cd(
         .s1x(10'd40),
@@ -169,10 +204,10 @@ module tt_um_pong (
             side <= 2'b01;
         end else begin
             if(p1_srv && side[1]) begin
-                b_delta <= 2'b01;
+                b_delta <= 2'b11;
                 side <= 2'b0;
             end else if(p2_srv && side[0]) begin
-                b_delta <= 2'b11;
+                b_delta <= 2'b01;
                 side <= 2'b0;
             end
 
@@ -199,5 +234,5 @@ module tt_um_pong (
         end
     end
 
-    wire _unused = &{ui_in[7:6], uio_in, ena, p1_srv, p2_srv, 1'b0};
+    wire _unused = &{uio_in, ena, stereo_en, pad, 1'b0};
 endmodule

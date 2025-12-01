@@ -9,7 +9,7 @@ supply1 pwr;
 
 tt_um_pong dut
 (
-    .ui_in (8'b0),
+    .ui_in (8'b00100000),
     .rst_n (rst_n),
     .clk (clk)
 );
