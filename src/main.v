@@ -114,6 +114,8 @@ module tt_um_pong (
     reg signed [1:0] b_delta;
     reg signed [2:0] by_delta;
 
+    // ***** MODULES *****
+
     coll #(.HEIGHT_1(50)) p1_cd(
         .s1x(10'd40),
         .s1y(p1_y),
@@ -137,30 +139,51 @@ module tt_um_pong (
         .coll_h(w_ch) // TODO: scoring
     );
 
-    always @(
-            posedge w_cv or posedge w_ch or posedge p1_c or posedge p2_c
-            or posedge p1_srv or posedge p2_srv
-            or negedge rst_n
-        ) begin
-        if(!rst_n) begin
+    // ***** CONTROL *****
+
+    // Pack all event inputs into a single bus
+    wire [5:0] evt_in = {w_cv, w_ch, p1_c, p2_c, p1_srv, p2_srv};
+    reg  [5:0] evt_d;  // previous values
+
+    // Rising edge detect (1 cycle pulse)
+    wire [5:0] evt_rise = evt_in & ~evt_d;
+
+    // Unpack edges
+    wire w_cv_rise   = evt_rise[5];
+    wire w_ch_rise   = evt_rise[4];
+    wire p1_c_rise   = evt_rise[3];
+    wire p2_c_rise   = evt_rise[2];
+    wire p1_srv_rise = evt_rise[1];
+    wire p2_srv_rise = evt_rise[0];
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
             by_delta <= 3'b001;
-            b_delta <= 2'b0;
-            side <= 2'b01;
+            b_delta  <= 2'b00;
+            side     <= 2'b01;
+            evt_d    <= 6'b0;
         end else begin
-            if(w_cv) begin
+            // capture for edge detect
+            evt_d <= evt_in;
+
+            // collision responses (optimized)
+            if (w_cv_rise)
                 by_delta <= -by_delta;
-            end else if(w_ch || p1_c || p2_c) begin
+
+            if (w_ch_rise | p1_c_rise | p2_c_rise)
                 b_delta <= -b_delta;
-            end
-            if(p1_srv && side[1]) begin
+
+            // serve logic (optimized)
+            if (p1_srv_rise && side[1]) begin
                 b_delta <= 2'b01;
-                side <= 2'b0;
-            end else if(p2_srv && side[0]) begin
+                side    <= 2'b00;
+            end else if (p2_srv_rise && side[0]) begin
                 b_delta <= 2'b11;
-                side <= 2'b0;
+                side    <= 2'b00;
             end
         end
     end
+
 
     // ******************** MOVEMENT ********************
 
