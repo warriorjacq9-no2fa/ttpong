@@ -19,3 +19,23 @@ module coll #( parameter
     ) ? 1'b1 : 1'b0;
 
 endmodule
+/* verilator lint_off DECLFILENAME */
+module wincoll #( parameter
+    S_WIDTH = 640,
+    S_HEIGHT = 480,
+    WIDTH = 10,
+    HEIGHT = 10
+)
+(
+    input wire [9:0] sx,
+    input wire [8:0] sy,
+    output wire coll_v, coll_h
+);
+
+    localparam W2 = WIDTH / 2;
+    localparam H2 = HEIGHT / 2;
+
+    assign coll_h = (sx <= W2 || sx >= S_WIDTH - W2);
+    assign coll_v = (sy <= H2 || sy >= S_HEIGHT - H2);
+
+endmodule

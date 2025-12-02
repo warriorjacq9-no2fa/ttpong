@@ -18,7 +18,7 @@ module tt_um_pong (
     localparam SPR_G = 2'b01;
     localparam SPR_B = 2'b00;
 
-    localparam P_SPD = 3;
+    localparam P_SPD = 4;
     localparam B_SPD = 3;
 
     assign uio_oe = 8'b0;
@@ -31,7 +31,7 @@ module tt_um_pong (
     wire hsync, vsync;
     wire a_mono;
     
-    wire p1_c, p2_c;
+    wire p1_c, p2_c, w_cv, w_ch;
 
     wire p1_up, p1_dn, p1_srv;
     wire p2_up, p2_dn, p2_srv;
@@ -47,8 +47,8 @@ module tt_um_pong (
     // ********************** AUDIO *********************
 
     // Set high when a beep is needed
-    wire beep_low = p1_c;
-    wire beep_high = p2_c;
+    wire beep_low = p1_c || p2_c || w_cv;
+    wire beep_high = w_ch;
 
     reg [15:0] tone_cnt;
 
@@ -112,6 +112,7 @@ module tt_um_pong (
     // ******************* COLLISIONS *******************
 
     reg signed [1:0] b_delta;
+    reg signed [2:0] by_delta;
 
     coll #(.HEIGHT_1(50)) p1_cd(
         .s1x(10'd40),
@@ -129,7 +130,39 @@ module tt_um_pong (
         .coll(p2_c)
     );
 
-    // ******************** GAMEPLAY ********************
+    wincoll w_cd(
+        .sx(ball_x),
+        .sy(ball_y),
+        .coll_v(w_cv),
+        .coll_h(w_ch) // TODO: scoring
+    );
+
+    always @(
+            posedge w_cv or posedge w_ch or posedge p1_c or posedge p2_c
+            or posedge p1_srv or posedge p2_srv
+            or negedge rst_n
+        ) begin
+        if(!rst_n) begin
+            by_delta <= 3'b001;
+            b_delta <= 2'b0;
+            side <= 2'b01;
+        end else begin
+            if(w_cv) begin
+                by_delta <= -by_delta;
+            end else if(w_ch || p1_c || p2_c) begin
+                b_delta <= -b_delta;
+            end
+            if(p1_srv && side[1]) begin
+                b_delta <= 2'b01;
+                side <= 2'b0;
+            end else if(p2_srv && side[0]) begin
+                b_delta <= 2'b11;
+                side <= 2'b0;
+            end
+        end
+    end
+
+    // ******************** MOVEMENT ********************
 
     always @(*) begin // Display logic
         r = 0;
@@ -177,26 +210,9 @@ module tt_um_pong (
 
             ball_x <= 10'd575;
             ball_y <= 9'd240;
-            b_delta <= 2'b0;
 
             sel_p1 <= 1'b0;
-
-            side <= 2'b01;
         end else begin
-            if(p1_srv && side[1]) begin
-                b_delta <= 2'b11;
-                side <= 2'b0;
-            end else if(p2_srv && side[0]) begin
-                b_delta <= 2'b01;
-                side <= 2'b0;
-            end
-
-            if(p1_c) begin
-                b_delta <= 2'b01;
-            end else if(p2_c) begin
-                b_delta <= 2'b11;
-            end
-
             vsync_prev <= vsync;
         
             if(vsync_negedge) begin
@@ -208,11 +224,12 @@ module tt_um_pong (
                 end
 
                 ball_x <= ball_x + {{8-_B_SPD{b_delta[1]}}, b_delta, {_B_SPD{1'b0}}};
+                ball_y <= ball_y + {{6-_B_SPD{by_delta[2]}}, by_delta, {_B_SPD{1'b0}}};
 
                 sel_p1 <= ~sel_p1;
             end
         end
     end
 
-    wire _unused = &{uio_in, ena, stereo_en, pad, 1'b0};
+    wire _unused = &{uio_in, ena, stereo_en, pad, w_ch, 1'b0};
 endmodule
