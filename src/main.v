@@ -35,6 +35,7 @@ module tt_um_pong (
 
     wire p1_up, p1_dn, p1_srv;
     wire p2_up, p2_dn, p2_srv;
+    reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
 
     wire stereo_en;
 
@@ -180,11 +181,16 @@ module tt_um_pong (
             if (w_ch_rise) begin
                 if(b_delta < 0) begin
                     score <= score + 1;
-                    b_delta <= -b_delta;
+                    b_delta <= 2'b0;
+                    ball_x <= 10'd575;
+                    side[0] <= 1'b1;
                 end else begin
                     score2 <= score2 + 1;
-                    b_delta <= -b_delta;
+                    b_delta <= 2'b0;
+                    ball_x <= 10'd65;
+                    side[0] <= 1'b1;
                 end
+                ball_y <= 9'd240;
             end
 
             // serve logic (optimized)
@@ -296,7 +302,6 @@ module tt_um_pong (
     reg sel_p1;
     wire signed [1:0] delta = 
         (sel_p1 ? (p1_up - p1_dn) : (p2_up - p2_dn));
-    reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
 
     localparam _P_SPD = P_SPD;
     localparam _B_SPD = B_SPD;
