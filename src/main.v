@@ -204,7 +204,7 @@ module tt_um_pong (
         15'b111_001_111_001_111, // 3
         15'b111_001_111_100_111, // 2
         15'b110_010_010_010_111, // 1
-        15'b111_101_101_101_111 // 0
+        15'b111_101_101_101_111  // 0
     };
 
     localparam SCORE1_X = 216;
@@ -246,7 +246,7 @@ module tt_um_pong (
             end else if (s1_en == 1) begin
 
                 // Draw pixel
-                if (nums[(score * 8'd15) +: 15][bit_index[3:0]]) begin
+                if (nums[(score * 8'd15) + bit_index[7:0]]) begin
                     r = 2'b11;
                     g = 2'b11;
                     b = 2'b11;
