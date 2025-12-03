@@ -14,9 +14,9 @@ module coll #( parameter
     wire [8:0] dy = (s1y > s2y ? s1y - s2y : s2y - s1y);
 
     assign coll = (
-        (dx <= (WIDTH_1 + WIDTH_2) / 2) &&
-        (dy <= (HEIGHT_1 + HEIGHT_2 / 2))
-    );
+        (dx * 2 <= (WIDTH_1 + WIDTH_2)) &&
+        (dy * 2 <= (HEIGHT_1 + HEIGHT_2))
+    ) ? 1'b1 : 1'b0;
 
 endmodule
 /* verilator lint_off DECLFILENAME */
