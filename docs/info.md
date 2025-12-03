@@ -21,7 +21,7 @@ Note: gate-level testing is not in real time, and presimulates the inputs and ou
 
 ### Hardware:
 
-Attach all external hardware. Be sure to enable reset. Press the P1SRV button to start the game, control with up and down.
+Attach all external hardware. Be sure to enable reset. Press the P2SRV button to start the game, control with up and down.
 
 ## External hardware
 
