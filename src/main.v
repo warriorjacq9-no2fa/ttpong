@@ -159,6 +159,9 @@ module tt_um_pong (
     wire p1_srv_rise = evt_rise[1];
     wire p2_srv_rise = evt_rise[0];
 
+    reg [9:0] bx_next;
+    reg by_rst;
+
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             by_delta    <= 3'b001;
@@ -167,6 +170,8 @@ module tt_um_pong (
             evt_d       <= 6'b0;
             score       <= 4'b0;
             score2      <= 4'b0;
+            bx_next     <= 10'b0;
+            by_rst      <= 1'b0;
         end else begin
             // capture for edge detect
             evt_d <= evt_in;
@@ -182,15 +187,17 @@ module tt_um_pong (
                 if(b_delta < 0) begin
                     score <= score + 1;
                     b_delta <= 2'b0;
-                    ball_x <= 10'd575;
+                    bx_next <= 10'd575;
                     side[0] <= 1'b1;
                 end else begin
                     score2 <= score2 + 1;
                     b_delta <= 2'b0;
-                    ball_x <= 10'd65;
-                    side[0] <= 1'b1;
+                    bx_next <= 10'd65;
+                    side[1] <= 1'b1;
                 end
-                ball_y <= 9'd240;
+                by_rst <= 1;
+            end else begin
+                by_rst <= 0;
             end
 
             // serve logic (optimized)
@@ -335,6 +342,10 @@ module tt_um_pong (
                 ball_y <= ball_y + {{6-_B_SPD{by_delta[2]}}, by_delta, {_B_SPD{1'b0}}};
 
                 sel_p1 <= ~sel_p1;
+            end
+            if(by_rst) begin
+                ball_x <= bx_next;
+                ball_y <= 9'd240;
             end
         end
     end
