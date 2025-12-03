@@ -141,6 +141,8 @@ module tt_um_pong (
 
     // ***** CONTROL *****
 
+    reg [3:0] score;
+
     // Pack all event inputs into a single bus
     wire [5:0] evt_in = {w_cv, w_ch, p1_c, p2_c, p1_srv, p2_srv};
     reg  [5:0] evt_d;  // previous values
@@ -158,10 +160,11 @@ module tt_um_pong (
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            by_delta <= 3'b001;
-            b_delta  <= 2'b00;
-            side     <= 2'b01;
-            evt_d    <= 6'b0;
+            by_delta    <= 3'b001;
+            b_delta     <= 2'b00;
+            side        <= 2'b01;
+            evt_d       <= 6'b0;
+            score       <= 4'b0;
         end else begin
             // capture for edge detect
             evt_d <= evt_in;
@@ -170,8 +173,13 @@ module tt_um_pong (
             if (w_cv_rise)
                 by_delta <= -by_delta;
 
-            if (w_ch_rise | p1_c_rise | p2_c_rise)
+            if (p1_c_rise | p2_c_rise)
                 b_delta <= -b_delta;
+            
+            if (w_ch_rise) begin
+                score <= score + 1;
+                b_delta <= -b_delta;
+            end
 
             // serve logic (optimized)
             if (p1_srv_rise && side[1]) begin
@@ -184,6 +192,36 @@ module tt_um_pong (
         end
     end
 
+    // ******************** SCORING  ********************
+
+    localparam [14:0] nums [0:9] = {
+        15'b111_101_101_101_111, // 0
+        15'b110_010_010_010_111, // 1
+        15'b111_001_111_100_111, // 2
+        15'b111_001_111_001_111, // 3
+        15'b101_101_111_001_001, // 4
+        15'b111_100_111_001_111, // 5
+        15'b111_100_111_101_111, // 6
+        15'b111_001_010_010_010, // 7
+        15'b111_101_111_101_111, // 8
+        15'b111_101_111_001_111  // 9
+    };
+
+    localparam SCORE1_X = 216;
+    localparam SCORE1_Y = 440;
+    wire s1_en;
+
+    sprite #(.WIDTH(24), .HEIGHT(40)) score1 (
+        .x(x),
+        .y(y),
+        .sx(SCORE1_X),
+        .sy(SCORE1_Y),
+        .en(s1_en)
+    );
+    
+    wire [10:0] col = (x - (SCORE1_X-12)) / 8;  // 0..2
+    wire [10:0] row = (y - (SCORE1_Y-20)) / 8;  // 0..4
+    wire [10:0] bit_index = row * 3 + (2 - col);   // 0..14
 
     // ******************** MOVEMENT ********************
 
@@ -205,6 +243,18 @@ module tt_um_pong (
                 r = SPR_R;
                 g = SPR_G;
                 b = SPR_B;
+            end else if (s1_en == 1) begin
+
+                // Draw pixel
+                if (nums[score][bit_index[3:0]]) begin
+                    r = 2'b11;
+                    g = 2'b11;
+                    b = 2'b11;
+                end else begin
+                    r = BKG_R;
+                    g = BKG_G;
+                    b = BKG_B;
+                end
             end else begin
                 r = BKG_R;
                 g = BKG_G;
@@ -254,5 +304,5 @@ module tt_um_pong (
         end
     end
 
-    wire _unused = &{uio_in, ena, stereo_en, pad, w_ch, 1'b0};
+    wire _unused = &{uio_in, ena, stereo_en, pad, bit_index[10:4], 1'b0};
 endmodule
