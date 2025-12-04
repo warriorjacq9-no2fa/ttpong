@@ -316,9 +316,16 @@ module tt_um_pong (
                     b = BKG_B;
                 end
             end else begin
-                r = BKG_R;
-                g = BKG_G;
-                b = BKG_B;
+                // Middle line
+                if((x > 315 && x < 325) && y[4]) begin
+                    r = SCR_R;
+                    g = SCR_G;
+                    b = SCR_B;
+                end else begin
+                    r = BKG_R;
+                    g = BKG_G;
+                    b = BKG_B;
+                end
             end
         end
     end
