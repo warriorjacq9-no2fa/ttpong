@@ -14,9 +14,21 @@ module tt_um_pong (
     localparam BKG_G = 2'b00;
     localparam BKG_B = 2'b00;
 
-    localparam SPR_R = 2'b00;
-    localparam SPR_G = 2'b01;
-    localparam SPR_B = 2'b00;
+    localparam SCR_R = 2'b11;
+    localparam SCR_G = 2'b11;
+    localparam SCR_B = 2'b11;
+
+    localparam P1_R = 2'b11;
+    localparam P1_G = 2'b00;
+    localparam P1_B = 2'b00;
+
+    localparam P2_R = 2'b00;
+    localparam P2_G = 2'b01;
+    localparam P2_B = 2'b11;
+
+    localparam BALL_R = 2'b00;
+    localparam BALL_G = 2'b11;
+    localparam BALL_B = 2'b00;
 
     localparam P_SPD = 4;
     localparam B_SPD = 3;
@@ -29,7 +41,6 @@ module tt_um_pong (
     wire [9:0] x, y;
     wire de;
     wire hsync, vsync;
-    wire a_mono;
     
     wire p1_c, p2_c, w_cv, w_ch;
 
@@ -38,18 +49,26 @@ module tt_um_pong (
     reg [1:0] side; // side[1]: ball serve on left, side[0]: ball serve on right
 
     wire stereo_en;
+    wire a_l, a_r;
+    wire a_mono = a_l | a_r;
+
+    reg signed [1:0] b_delta;
+    reg signed [2:0] by_delta;
 
     assign {stereo_en, pad, p2_srv, p2_dn, p2_up, p1_srv, p1_dn, p1_up} = ui_in[7:0];
 
     assign uo_out[7:0] = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
     assign uio_out[5:0] = {5'b0, de};
-    assign uio_out[7:6] = {a_mono, 1'b0};
+    assign uio_out[7:6] = stereo_en ? {a_r, a_l} : {a_mono, 1'b0};
 
     // ********************** AUDIO *********************
 
     // Set high when a beep is needed
     wire beep_low = p1_c || p2_c || w_cv;
     wire beep_high = w_ch;
+
+    wire ball_r = (b_delta > 0);
+    wire ball_l = ~ball_r;
 
     reg [15:0] tone_cnt;
 
@@ -64,7 +83,8 @@ module tt_um_pong (
     wire a_low  = tone_cnt[15];   // ~381 Hz
     wire a_high = tone_cnt[14];   // ~762 Hz
 
-    assign a_mono = (beep_low ? a_low : (beep_high ? a_high : 0));
+    assign a_r = ball_r ? (beep_low ? a_low : (beep_high ? a_high : 0)) : 0;
+    assign a_l = ball_l ? (beep_low ? a_low : (beep_high ? a_high : 0)) : 0;
 
     // ******************** GRAPHICS ********************
     vga vga (
@@ -111,9 +131,6 @@ module tt_um_pong (
     );
 
     // ******************* COLLISIONS *******************
-
-    reg signed [1:0] b_delta;
-    reg signed [2:0] by_delta;
 
     // ***** MODULES *****
 
@@ -267,22 +284,22 @@ module tt_um_pong (
 
         if(de == 1) begin
             if(p1_en == 1) begin
-                r = SPR_R;
-                g = SPR_G;
-                b = SPR_B;
+                r = P1_R;
+                g = P1_G;
+                b = P1_B;
             end else if(p2_en == 1) begin
-                r = SPR_R;
-                g = SPR_G;
-                b = SPR_B;
+                r = P2_R;
+                g = P2_G;
+                b = P2_B;
             end else if(ball_en == 1) begin
-                r = SPR_R;
-                g = SPR_G;
-                b = SPR_B;
+                r = BALL_R;
+                g = BALL_G;
+                b = BALL_B;
             end else if(s1_en == 1) begin
                 if (nums[(score * 8'd15) + bit_index[7:0]]) begin
-                    r = 2'b11;
-                    g = 2'b11;
-                    b = 2'b11;
+                    r = SCR_R;
+                    g = SCR_G;
+                    b = SCR_B;
                 end else begin
                     r = BKG_R;
                     g = BKG_G;
