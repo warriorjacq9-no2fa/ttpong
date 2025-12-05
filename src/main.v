@@ -197,18 +197,39 @@ module tt_um_pong (
             if (w_cv_rise)
                 by_delta <= -by_delta;
 
-            if (p1_c_rise | p2_c_rise)
+            if (p1_c_rise) begin
                 b_delta <= -b_delta;
-            
+                if(ball_y > p1_y + 5) begin
+                    by_delta <= (by_delta < 0 ? -1 : 2);
+                end else if(ball_y < p1_y - 1) begin
+                    by_delta <= (by_delta < 0 ? -2 : 1);
+                end else begin
+                    by_delta <= (by_delta < 0 ? -1 : 1);
+                end
+            end
+
+            if (p2_c_rise) begin
+                b_delta <= -b_delta;
+                if(ball_y > p2_y + 5) begin
+                    by_delta <= (by_delta < 0 ? -1 : 2);
+                end else if(ball_y < p2_y - 10) begin
+                    by_delta <= (by_delta < 0 ? -2 : 1);
+                end else begin
+                    by_delta <= (by_delta < 0 ? -1 : 1);
+                end
+            end
+
             if (w_ch_rise) begin
-                if(b_delta < 0) begin
+                if(ball_l) begin
                     score <= score + 1;
                     b_delta <= 2'b0;
+                    by_delta <= 3'b1;
                     bx_next <= 10'd575;
                     side[0] <= 1'b1;
                 end else begin
                     score2 <= score2 + 1;
                     b_delta <= 2'b0;
+                    by_delta <= 3'b1;
                     bx_next <= 10'd65;
                     side[1] <= 1'b1;
                 end
