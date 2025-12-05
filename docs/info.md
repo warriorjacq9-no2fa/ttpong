@@ -21,8 +21,15 @@ Note: gate-level testing is not in real time, and presimulates the inputs and ou
 
 ### Hardware:
 
-Attach all external hardware. Be sure to enable reset. Press the P2SRV button to start the game, control with up and down.
+Attach all external hardware. Be sure to reset the design. Press the P2SRV button to start the game, control with up and down.
 
 ## External hardware
 
-TinyVGA PMOD, 6 buttons, 6 pullup resistors (10K) connected from button "output" to 3.3v. Optionally 6 100nF capacitors connected to the button "output" and ground, combined with 6 1K resistors in series from the button to the chip inputs, for debouncing.
+ - TinyVGA PMOD
+ - 6 buttons connected between 3.3v and input
+ - 6 pulldown resistors (10K) connected from button output to ground
+
+Optional (debouncing):
+
+ - 6 100nF capacitors connected in parallel with the buttons
+ - 6 100-220 ohm resistors in series from the buttons to the chip inputs
