@@ -179,6 +179,7 @@ module tt_um_pong (
     reg [9:0] bx_next;
     reg by_rst;
     wire win = (score >= 9 || score2 > 9);
+    reg score_rst, score2_rst;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -247,6 +248,9 @@ module tt_um_pong (
                 b_delta <= 2'b11;
                 side    <= 2'b00;
             end
+
+            if(score_rst) score <= 0;
+            if(score2_rst) score2 <= 0;
         end
     end
 
@@ -399,8 +403,8 @@ module tt_um_pong (
                     second_tmp <= second_cnt + 63;
                 end
                 if(second_tmp == second_cnt && win) begin
-                    score <= 0;
-                    score2 <= 0;
+                    score_rst <= 0;
+                    score2_rst <= 0;
                 end
             end
             if(by_rst) begin
