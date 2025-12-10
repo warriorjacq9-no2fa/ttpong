@@ -65,7 +65,7 @@ module tt_um_pong (
 
     // Set high when a beep is needed
     wire beep_low = p1_c || p2_c || w_cv;
-    wire beep_high = w_ch;
+    wire beep_high = w_ch || win;
 
     wire ball_r = (b_delta > 0);
     wire ball_l = ~ball_r;
@@ -178,6 +178,7 @@ module tt_um_pong (
 
     reg [9:0] bx_next;
     reg by_rst;
+    wire win = (score >= 9 || score2 > 9);
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -303,7 +304,7 @@ module tt_um_pong (
         g = 0;
         b = 0;
 
-        if(de == 1) begin
+        if(de == 1 && win == 0) begin
             if(p1_en == 1) begin
                 r = P1_R;
                 g = P1_G;
@@ -361,9 +362,14 @@ module tt_um_pong (
     reg vsync_prev;
     wire vsync_negedge = vsync_prev && !vsync;
 
+    reg [5:0] second_cnt;
+    reg [5:0] second_tmp;
+
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             vsync_prev <= 1'b0;
+            second_cnt <= 6'b0;
+            second_tmp <= 6'b0;
 
             p1_y <= 9'd240;
             p2_y <= 9'd240;
@@ -387,6 +393,15 @@ module tt_um_pong (
                 ball_y <= ball_y + {{6-_B_SPD{by_delta[2]}}, by_delta, {_B_SPD{1'b0}}};
 
                 sel_p1 <= ~sel_p1;
+
+                second_cnt <= second_cnt + 1;
+                if(win && (second_tmp == 0)) begin
+                    second_tmp <= second_cnt + 63;
+                end
+                if(second_tmp == second_cnt && win) begin
+                    score <= 0;
+                    score2 <= 0;
+                end
             end
             if(by_rst) begin
                 ball_x <= bx_next;
