@@ -179,7 +179,7 @@ module tt_um_pong (
     reg [9:0] bx_next;
     reg by_rst;
     wire win = (score >= 9 || score2 > 9);
-    reg score_rst, score2_rst;
+    reg game_rst;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -249,8 +249,10 @@ module tt_um_pong (
                 side    <= 2'b00;
             end
 
-            if(score_rst) score <= 0;
-            if(score2_rst) score2 <= 0;
+            if(game_rst) begin
+                score <= 0;
+                score2 <= 0;
+            end
         end
     end
 
@@ -374,6 +376,7 @@ module tt_um_pong (
             vsync_prev <= 1'b0;
             second_cnt <= 6'b0;
             second_tmp <= 6'b0;
+            game_rst <= 1'b0;
 
             p1_y <= 9'd240;
             p2_y <= 9'd240;
@@ -400,11 +403,18 @@ module tt_um_pong (
 
                 second_cnt <= second_cnt + 1;
                 if(win && (second_tmp == 0)) begin
-                    second_tmp <= second_cnt + 63;
+                    second_tmp <= second_cnt + 60;
                 end
                 if(second_tmp == second_cnt && win) begin
-                    score_rst <= 0;
-                    score2_rst <= 0;
+                    game_rst <= 1;
+                    second_tmp <= 0;
+                    
+                    p1_y <= 9'd240;
+                    p2_y <= 9'd240;
+                    ball_x <= 10'd575;
+                    ball_y <= 9'd240;
+                end else begin
+                    game_rst <= 0;
                 end
             end
             if(by_rst) begin
