@@ -26,10 +26,4 @@ Attach all external hardware. Be sure to reset the design. Press the P2SRV butto
 ## External hardware
 
  - TinyVGA PMOD
- - 6 buttons connected between 3.3v and input
- - 6 pulldown resistors (10K) connected from button output to ground
-
-Optional (debouncing):
-
- - 6 100nF capacitors connected in parallel with the buttons
- - 6 100-220 ohm resistors in series from the buttons to the chip inputs
+ - 6 buttons connected between 3.3v and input and pulldown resistors for the buttons
