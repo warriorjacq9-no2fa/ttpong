@@ -1,15 +1,10 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/desktop-lite:1": {
       "start": true,
       "webPort": 6080
     }
   },
-  "forwardPorts": [6080],
-  "portsAttributes": {
-    "6080": {
-      "label": "Desktop"
-    }
-  }
+  "forwardPorts": [6080]
 }
